@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: course-timetable-planner
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/timetable}
+    username: ${SPRING_DATASOURCE_USERNAME:timetable}
+    password: ${SPRING_DATASOURCE_PASSWORD:timetable}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+server:
+  port: ${SERVER_PORT:8080}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
