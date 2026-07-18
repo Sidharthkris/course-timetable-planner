@@ -1,6 +1,6 @@
 # Course Timetable Planner API
 
-[![CI](https://github.com/sidharthkris/course-timetable-planner/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/course-timetable-planner/actions/workflows/ci.yml)
+[![CI](https://github.com/sidharthkris/course-timetable-planner/actions/workflows/ci.yml/badge.svg)](https://github.com/sidharthkris/course-timetable-planner/actions/workflows/ci.yml)
 
 A Spring Boot REST API for scheduling courses, instructors, and rooms
 — with automatic conflict detection so no instructor or room is ever
