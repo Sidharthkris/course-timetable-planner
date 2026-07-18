@@ -53,17 +53,17 @@ course-timetable-planner/
 ├── .github/workflows/ci.yml
 ├── src/main/java/com/portfolio/timetable/
 │   ├── TimetableApplication.java
-│   ├── model/          Department, Instructor, Room, Course, ScheduleEntry
-│   ├── dto/              Request/Response records per entity + error shapes
-│   ├── repository/       Spring Data JPA repositories
-│   ├── service/           CRUD services + ConflictDetectionService
-│   ├── controller/        REST controllers
-│   ├── exception/         Custom exceptions + GlobalExceptionHandler
+│   ├── model/              Department, Instructor, Room, Course, ScheduleEntry
+│   ├── dto/                Request/Response records per entity + error shapes
+│   ├── repository/         Spring Data JPA repositories
+│   ├── service/            CRUD services + ConflictDetectionService
+│   ├── controller/         REST controllers
+│   ├── exception/          Custom exceptions + GlobalExceptionHandler
 │   └── config/             OpenAPI metadata + dev-profile data seeder
 └── src/test/java/com/portfolio/timetable/
-    ├── model/               pure overlap-logic test
-    ├── service/              Mockito-based conflict detection test
-    └── controller/            full-stack MockMvc integration test
+    ├── model/              pure overlap-logic test
+    ├── service/            Mockito-based conflict detection test
+    └── controller/         full-stack MockMvc integration test
 ```
 
 ## Prerequisites
@@ -148,18 +148,6 @@ checks each remaining one with `overlaps`. It's deliberately kept as
 its own class, independent of Spring's web or persistence concerns,
 so `ScheduleEntryOverlapsTest` and `ConflictDetectionServiceTest` can
 exercise it with zero database or HTTP involved.
-
-## A note on verification
-
-I wasn't able to compile or run this project inside my own sandbox —
-Spring Boot 3 needs `jakarta.*` packages that aren't available through
-apt here, and Maven Central isn't reachable from this environment. I
-reviewed every file by hand (brace/paren balance, record field order
-against every call site, Spring Data method-name-to-query resolution)
-but this is the one project in the portfolio series I couldn't
-actually execute before handing it to you. Please run `mvn test`
-first thing — if anything fails, tell me the exact output and I'll
-fix it.
 
 ## Possible extensions
 
