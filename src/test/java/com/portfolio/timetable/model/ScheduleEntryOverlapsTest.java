@@ -47,7 +47,6 @@ class ScheduleEntryOverlapsTest {
 
     @Test
     void backToBackRangesDoNotOverlap() {
-        // 09:00-10:00 and 10:00-11:00 share only the boundary instant, not a range
         ScheduleEntry a = entry(DayOfWeek.MONDAY, "09:00", "10:00");
         ScheduleEntry b = entry(DayOfWeek.MONDAY, "10:00", "11:00");
         assertFalse(a.overlaps(b));

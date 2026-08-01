@@ -7,6 +7,7 @@ import com.portfolio.timetable.exception.ResourceNotFoundException;
 import com.portfolio.timetable.model.Course;
 import com.portfolio.timetable.model.Department;
 import com.portfolio.timetable.repository.CourseRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class CourseService {
         this.departmentService = departmentService;
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public Response create(Request request) {
         if (courseRepository.existsByCodeIgnoreCase(request.code())) {
             throw new IllegalArgumentException("A course with code '" + request.code() + "' already exists");
@@ -44,6 +46,7 @@ public class CourseService {
         return toResponse(getOrThrow(id));
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public Response update(Long id, Request request) {
         Course course = getOrThrow(id);
         course.setCode(request.code());
@@ -53,6 +56,7 @@ public class CourseService {
         return toResponse(course);
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public void delete(Long id) {
         if (!courseRepository.existsById(id)) {
             throw new ResourceNotFoundException("Course " + id + " not found");

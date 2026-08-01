@@ -7,6 +7,7 @@ import com.portfolio.timetable.exception.ResourceNotFoundException;
 import com.portfolio.timetable.model.Department;
 import com.portfolio.timetable.model.Instructor;
 import com.portfolio.timetable.repository.InstructorRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class InstructorService {
         this.departmentService = departmentService;
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public Response create(Request request) {
         Department department = departmentService.getOrThrow(request.departmentId());
         Instructor saved = instructorRepository.save(
@@ -41,6 +43,7 @@ public class InstructorService {
         return toResponse(getOrThrow(id));
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public Response update(Long id, Request request) {
         Instructor instructor = getOrThrow(id);
         instructor.setFullName(request.fullName());
@@ -49,6 +52,7 @@ public class InstructorService {
         return toResponse(instructor);
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public void delete(Long id) {
         if (!instructorRepository.existsById(id)) {
             throw new ResourceNotFoundException("Instructor " + id + " not found");

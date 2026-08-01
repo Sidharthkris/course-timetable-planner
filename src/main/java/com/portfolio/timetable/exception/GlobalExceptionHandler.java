@@ -7,6 +7,7 @@ import com.portfolio.timetable.service.ScheduleEntryService;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,10 +20,13 @@ import java.util.stream.Collectors;
  * Translates every exception the service layer can throw into the
  * HTTP status code a REST client actually expects: 404 for missing
  * resources, 409 for scheduling conflicts, 400 for validation and
- * bad-argument errors. Centralizing this here keeps every controller
- * free of try/catch blocks.
+ * bad-argument errors, 403 when an instructor attempts a
+ * coordinator-only action. Scoped to {@code controller} (the REST
+ * package) via {@code basePackages} so it never intercepts exceptions
+ * thrown from the Thymeleaf {@code web} controllers, which need HTML
+ * error handling instead of JSON.
  */
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.portfolio.timetable.controller")
 public class GlobalExceptionHandler {
 
     private final ScheduleEntryService scheduleEntryService;
@@ -45,6 +49,12 @@ public class GlobalExceptionHandler {
         ScheduleConflictError body = new ScheduleConflictError(
                 Instant.now(), 409, "Conflict", ex.getMessage(), conflicts);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiError.of(403, "Forbidden", "Only a coordinator can perform this action."));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

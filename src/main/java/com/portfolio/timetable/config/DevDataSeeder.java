@@ -12,17 +12,29 @@ import com.portfolio.timetable.service.RoomService;
 import com.portfolio.timetable.service.ScheduleEntryService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * Populates a handful of departments, instructors, rooms, courses,
  * and a small conflict-free timetable so there's something to look
- * at in Swagger UI immediately after starting the app with the
- * {@code dev} profile. Never runs against the production/Docker
- * profile, which is expected to start with an empty database.
+ * at immediately after starting the app with the {@code dev} profile.
+ *
+ * <p>This runs at application startup, outside of any HTTP request —
+ * there's no logged-in user yet, but the create methods it calls are
+ * all guarded by {@code @PreAuthorize("hasRole('COORDINATOR')")}.
+ * Rather than weaken that guard, this seeder briefly installs a
+ * synthetic "system" authentication with the COORDINATOR role for
+ * the duration of the seeding, then clears it — the same pattern a
+ * real application would use for a scheduled job or migration script
+ * that needs to bypass normal user-based authorization.
  */
 @Component
 @Profile("dev")
@@ -46,6 +58,10 @@ public class DevDataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        runAsSystemCoordinator(this::seedData);
+    }
+
+    private void seedData() {
         DepartmentDtos.Response cs = departmentService.create(new DepartmentDtos.Request("CS", "Computer Science"));
         DepartmentDtos.Response ds = departmentService.create(new DepartmentDtos.Request("DS", "Data Science"));
 
@@ -76,9 +92,22 @@ public class DevDataSeeder implements CommandLineRunner {
 
                 ---------------------------------------------------------------
                 Dev data seeded: 2 departments, 2 instructors, 2 rooms, 2 courses, 3 schedule entries.
-                Try POSTing another entry for Dr. Rao on Monday 09:00-11:00 in room 101 -> expect 409 Conflict.
+                Log in at http://localhost:8080/login as:
+                  coordinator / coordinator123  (full access)
+                  instructor  / instructor123   (view only)
                 Swagger UI: http://localhost:8080/swagger-ui.html
                 ---------------------------------------------------------------
                 """);
+    }
+
+    private void runAsSystemCoordinator(Runnable action) {
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_COORDINATOR"));
+        var systemAuth = new UsernamePasswordAuthenticationToken("system-seeder", null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(systemAuth);
+        try {
+            action.run();
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
     }
 }

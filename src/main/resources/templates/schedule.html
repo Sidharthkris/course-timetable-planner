@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Schedule — Course Timetable Planner</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<main class="container container-wide">
+    <h1>Weekly Schedule</h1>
+
+    <p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+    <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+
+    <div class="calendar-scroll">
+        <table class="calendar-table">
+            <thead>
+            <tr>
+                <th class="time-col">Time</th>
+                <th th:each="day : ${displayDays}" th:text="${#strings.capitalize(#strings.toLowerCase(day.toString()))}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="rowTime, rowStat : ${grid.rowStartTimes}">
+                <td class="time-col" th:text="${rowTime}"></td>
+                <td th:each="day : ${displayDays}">
+                    <div class="entry-chip" th:each="entry : ${grid.cellsByDay.get(day).get(rowStat.index)}">
+                        <div class="entry-time" th:text="${entry.startTime} + '–' + ${entry.endTime}"></div>
+                        <div class="entry-course" th:text="${entry.course.code}"></div>
+                        <div class="entry-meta" th:text="${entry.instructor.fullName}"></div>
+                        <div class="entry-meta" th:text="'Room ' + ${entry.room.roomNumber}"></div>
+                        <form sec:authorize="hasRole('COORDINATOR')"
+                              th:action="@{/schedule/{id}/delete(id=${entry.id})}" method="post"
+                              onsubmit="return confirm('Delete this schedule entry?');">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button type="submit" class="link-button danger entry-delete">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(grid.outOfRangeEntries)}" class="form-card" style="margin-top:1.5rem;">
+        <h2>Outside displayed hours (before 08:00 or at/after 20:00)</h2>
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Course</th>
+                <th>Instructor</th>
+                <th>Room</th>
+                <th sec:authorize="hasRole('COORDINATOR')">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="entry : ${grid.outOfRangeEntries}">
+                <td th:text="${entry.dayOfWeek}"></td>
+                <td th:text="${entry.startTime} + ' - ' + ${entry.endTime}"></td>
+                <td th:text="${entry.course.code} + ' — ' + ${entry.course.title}"></td>
+                <td th:text="${entry.instructor.fullName}"></td>
+                <td th:text="${entry.room.roomNumber}"></td>
+                <td sec:authorize="hasRole('COORDINATOR')">
+                    <form th:action="@{/schedule/{id}/delete(id=${entry.id})}" method="post" style="display:inline"
+                          onsubmit="return confirm('Delete this schedule entry?');">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <button type="submit" class="link-button danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div sec:authorize="hasRole('COORDINATOR')" class="form-card" style="margin-top:1.5rem;">
+        <h2>Add a schedule entry</h2>
+        <form th:action="@{/schedule}" method="post" class="form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <label for="courseId">Course</label>
+            <select id="courseId" name="courseId" required="required">
+                <option th:each="course : ${courses}" th:value="${course.id}"
+                        th:text="${course.code} + ' — ' + ${course.title}"></option>
+            </select>
+
+            <label for="instructorId">Instructor</label>
+            <select id="instructorId" name="instructorId" required="required">
+                <option th:each="instructor : ${instructors}" th:value="${instructor.id}"
+                        th:text="${instructor.fullName}"></option>
+            </select>
+
+            <label for="roomId">Room</label>
+            <select id="roomId" name="roomId" required="required">
+                <option th:each="room : ${rooms}" th:value="${room.id}"
+                        th:text="${room.roomNumber} + ' (' + ${room.building} + ')'"></option>
+            </select>
+
+            <label for="dayOfWeek">Day</label>
+            <select id="dayOfWeek" name="dayOfWeek" required="required">
+                <option value="MONDAY">Monday</option>
+                <option value="TUESDAY">Tuesday</option>
+                <option value="WEDNESDAY">Wednesday</option>
+                <option value="THURSDAY">Thursday</option>
+                <option value="FRIDAY">Friday</option>
+                <option value="SATURDAY">Saturday</option>
+                <option value="SUNDAY">Sunday</option>
+            </select>
+
+            <label for="startTime">Start time</label>
+            <input type="time" id="startTime" name="startTime" required="required"/>
+
+            <label for="endTime">End time</label>
+            <input type="time" id="endTime" name="endTime" required="required"/>
+
+            <p class="hint">Grid displays 08:00–20:00; entries outside that range still save
+                correctly and appear in the table above the form.</p>
+
+            <button type="submit">Add to schedule</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

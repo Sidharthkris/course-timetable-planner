@@ -25,7 +25,7 @@ public class DepartmentController {
     }
 
     @PostMapping
-    @Operation(summary = "Create a department")
+    @Operation(summary = "Create a department (coordinator only)")
     public ResponseEntity<Response> create(@Valid @RequestBody Request request) {
         Response created = departmentService.create(request);
         return ResponseEntity.created(URI.create("/api/departments/" + created.id())).body(created);
@@ -44,13 +44,13 @@ public class DepartmentController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update a department")
+    @Operation(summary = "Update a department (coordinator only)")
     public Response update(@PathVariable Long id, @Valid @RequestBody Request request) {
         return departmentService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a department")
+    @Operation(summary = "Delete a department (coordinator only)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         departmentService.delete(id);

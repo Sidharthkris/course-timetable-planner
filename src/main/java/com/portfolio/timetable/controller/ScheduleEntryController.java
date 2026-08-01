@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/schedule-entries")
-@Tag(name = "Schedule Entries", description = "The timetable itself: course + instructor + room + day + time, with automatic conflict detection")
+@Tag(name = "Schedule Entries", description = "The timetable itself: course + instructor + room + day + time, with automatic conflict detection. Create/update/delete require the COORDINATOR role; reads are open to any authenticated user.")
 public class ScheduleEntryController {
 
     private final ScheduleEntryService scheduleEntryService;
@@ -30,7 +30,7 @@ public class ScheduleEntryController {
     }
 
     @PostMapping
-    @Operation(summary = "Create a schedule entry",
+    @Operation(summary = "Create a schedule entry (coordinator only)",
             description = "Returns 409 Conflict if the instructor or room is already booked at an overlapping time on the same day")
     public ResponseEntity<Response> create(@Valid @RequestBody Request request) {
         Response created = scheduleEntryService.create(request);
@@ -38,7 +38,7 @@ public class ScheduleEntryController {
     }
 
     @PostMapping("/check-conflicts")
-    @Operation(summary = "Dry-run a proposed slot",
+    @Operation(summary = "Dry-run a proposed slot (any authenticated user)",
             description = "Returns the list of entries a proposed slot would conflict with, without saving anything. An empty list means the slot is free.")
     public List<Response> checkConflicts(@Valid @RequestBody Request request) {
         return scheduleEntryService.checkConflicts(request);
@@ -62,14 +62,14 @@ public class ScheduleEntryController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update a schedule entry",
+    @Operation(summary = "Update a schedule entry (coordinator only)",
             description = "Re-runs conflict detection excluding this entry itself; returns 409 if the new slot clashes with a different entry")
     public Response update(@PathVariable Long id, @Valid @RequestBody Request request) {
         return scheduleEntryService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a schedule entry")
+    @Operation(summary = "Delete a schedule entry (coordinator only)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         scheduleEntryService.delete(id);

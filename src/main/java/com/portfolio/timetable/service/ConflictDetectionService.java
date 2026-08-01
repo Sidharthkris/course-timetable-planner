@@ -41,6 +41,9 @@ public class ConflictDetectionService {
         List<ScheduleEntry> sameRoom = scheduleEntryRepository.findByRoomIdAndDayOfWeek(
                 candidate.getRoom().getId(), candidate.getDayOfWeek());
 
+        // Dedupe by ID rather than relying on default Object identity via
+        // Stream.distinct(), since JPA doesn't guarantee the same managed
+        // instance is returned across two separate repository calls.
         Map<Long, ScheduleEntry> byId = new LinkedHashMap<>();
         for (ScheduleEntry entry : sameInstructor) {
             byId.put(entry.getId(), entry);

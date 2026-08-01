@@ -17,6 +17,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+/**
+ * Plain Mockito unit test, instantiated with {@code new} rather than
+ * through Spring — so {@code @PreAuthorize} (which is enforced by a
+ * Spring AOP proxy, not present here) never comes into play. This
+ * class is deliberately independent of both the database and Spring
+ * Security.
+ */
 @ExtendWith(MockitoExtension.class)
 class ConflictDetectionServiceTest {
 
@@ -106,7 +113,6 @@ class ConflictDetectionServiceTest {
 
     @Test
     void excludesGivenEntryIdFromConflictsWhenUpdating() {
-        // The entry being updated would otherwise "conflict with itself"
         ScheduleEntry existing = entry(5L, instructorA, roomA, DayOfWeek.MONDAY, "09:00", "10:00");
         when(scheduleEntryRepository.findByInstructorIdAndDayOfWeek(1L, DayOfWeek.MONDAY))
                 .thenReturn(List.of(existing));
@@ -121,8 +127,6 @@ class ConflictDetectionServiceTest {
 
     @Test
     void reportsASharedConflictOnlyOnceWhenBothInstructorAndRoomMatch() {
-        // Same existing entry returned by both lookups (matches both the
-        // candidate's instructor AND its room) must be reported only once.
         ScheduleEntry existing = entry(1L, instructorA, roomA, DayOfWeek.MONDAY, "09:00", "10:00");
         when(scheduleEntryRepository.findByInstructorIdAndDayOfWeek(1L, DayOfWeek.MONDAY))
                 .thenReturn(List.of(existing));

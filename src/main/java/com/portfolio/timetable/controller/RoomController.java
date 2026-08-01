@@ -25,7 +25,7 @@ public class RoomController {
     }
 
     @PostMapping
-    @Operation(summary = "Create a room")
+    @Operation(summary = "Create a room (coordinator only)")
     public ResponseEntity<Response> create(@Valid @RequestBody Request request) {
         Response created = roomService.create(request);
         return ResponseEntity.created(URI.create("/api/rooms/" + created.id())).body(created);
@@ -44,13 +44,13 @@ public class RoomController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update a room")
+    @Operation(summary = "Update a room (coordinator only)")
     public Response update(@PathVariable Long id, @Valid @RequestBody Request request) {
         return roomService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a room")
+    @Operation(summary = "Delete a room (coordinator only)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         roomService.delete(id);

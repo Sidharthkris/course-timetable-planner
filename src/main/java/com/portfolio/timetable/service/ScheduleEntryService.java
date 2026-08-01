@@ -12,6 +12,7 @@ import com.portfolio.timetable.model.*;
 import com.portfolio.timetable.repository.ScheduleEntryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,12 +41,14 @@ public class ScheduleEntryService {
         this.conflictDetectionService = conflictDetectionService;
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public Response create(Request request) {
         ScheduleEntry candidate = buildCandidate(request);
         rejectIfConflicting(candidate, null);
         return toResponse(scheduleEntryRepository.save(candidate));
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public Response update(Long id, Request request) {
         ScheduleEntry existing = getOrThrow(id);
         ScheduleEntry candidate = buildCandidate(request);
@@ -71,6 +74,7 @@ public class ScheduleEntryService {
                 .map(this::toResponse);
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public void delete(Long id) {
         if (!scheduleEntryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Schedule entry " + id + " not found");
@@ -81,6 +85,7 @@ public class ScheduleEntryService {
     /**
      * Checks whether a proposed entry would conflict, without saving
      * anything — lets a client validate a slot before committing to it.
+     * Read-only, so both roles may call this.
      */
     @Transactional(readOnly = true)
     public List<Response> checkConflicts(Request request) {

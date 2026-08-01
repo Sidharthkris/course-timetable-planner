@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Access Denied — Course Timetable Planner</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="auth-body">
+<div class="auth-card">
+    <h1>Access denied</h1>
+    <p>Your account doesn't have permission to perform that action. Instructors have
+        view-only access; only a coordinator can create, update, or delete records.</p>
+    <p><a th:href="@{/schedule}">&larr; Back to schedule</a></p>
+</div>
+</body>
+</html>

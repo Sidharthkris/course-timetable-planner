@@ -5,6 +5,7 @@ import com.portfolio.timetable.dto.RoomDtos.Response;
 import com.portfolio.timetable.exception.ResourceNotFoundException;
 import com.portfolio.timetable.model.Room;
 import com.portfolio.timetable.repository.RoomRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ public class RoomService {
         this.roomRepository = roomRepository;
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public Response create(Request request) {
         if (roomRepository.existsByRoomNumberIgnoreCase(request.roomNumber())) {
             throw new IllegalArgumentException("A room numbered '" + request.roomNumber() + "' already exists");
@@ -38,6 +40,7 @@ public class RoomService {
         return toResponse(getOrThrow(id));
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public Response update(Long id, Request request) {
         Room room = getOrThrow(id);
         room.setRoomNumber(request.roomNumber());
@@ -46,6 +49,7 @@ public class RoomService {
         return toResponse(room);
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public void delete(Long id) {
         if (!roomRepository.existsById(id)) {
             throw new ResourceNotFoundException("Room " + id + " not found");

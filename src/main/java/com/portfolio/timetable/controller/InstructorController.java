@@ -25,7 +25,7 @@ public class InstructorController {
     }
 
     @PostMapping
-    @Operation(summary = "Create an instructor")
+    @Operation(summary = "Create an instructor (coordinator only)")
     public ResponseEntity<Response> create(@Valid @RequestBody Request request) {
         Response created = instructorService.create(request);
         return ResponseEntity.created(URI.create("/api/instructors/" + created.id())).body(created);
@@ -44,13 +44,13 @@ public class InstructorController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update an instructor")
+    @Operation(summary = "Update an instructor (coordinator only)")
     public Response update(@PathVariable Long id, @Valid @RequestBody Request request) {
         return instructorService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete an instructor")
+    @Operation(summary = "Delete an instructor (coordinator only)")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         instructorService.delete(id);

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<nav th:fragment="nav" class="navbar">
+    <div class="nav-brand">Course Timetable Planner</div>
+    <div class="nav-links">
+        <a th:href="@{/schedule}">Schedule</a>
+        <a th:href="@{/departments}">Departments</a>
+        <a th:href="@{/instructors}">Instructors</a>
+        <a th:href="@{/rooms}">Rooms</a>
+        <a th:href="@{/courses}">Courses</a>
+    </div>
+    <div class="nav-user">
+        <span sec:authentication="name"></span>
+        (<span sec:authentication="authorities"></span>)
+        <form th:action="@{/logout}" method="post" style="display:inline; margin:0;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="link-button" style="color:#dce6f5;">Logout</button>
+        </form>
+    </div>
+</nav>
+</body>
+</html>

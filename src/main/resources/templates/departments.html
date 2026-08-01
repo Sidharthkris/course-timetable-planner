@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Departments — Course Timetable Planner</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<main class="container">
+    <h1>Departments</h1>
+
+    <p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+    <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th sec:authorize="hasRole('COORDINATOR')">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="department : ${departments}">
+            <td th:text="${department.code}"></td>
+            <td th:text="${department.name}"></td>
+            <td sec:authorize="hasRole('COORDINATOR')">
+                <form th:action="@{/departments/{id}/delete(id=${department.id})}" method="post" style="display:inline"
+                      onsubmit="return confirm('Delete this department?');">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="link-button danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(departments)}">
+            <td colspan="3">No departments yet.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div sec:authorize="hasRole('COORDINATOR')" class="form-card">
+        <h2>Add a department</h2>
+        <form th:action="@{/departments}" method="post" class="form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <label for="code">Code</label>
+            <input type="text" id="code" name="code" required="required" placeholder="e.g. CS"/>
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required="required" placeholder="e.g. Computer Science"/>
+            <button type="submit">Add department</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

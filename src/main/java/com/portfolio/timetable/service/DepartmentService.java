@@ -5,6 +5,7 @@ import com.portfolio.timetable.dto.DepartmentDtos.Response;
 import com.portfolio.timetable.exception.ResourceNotFoundException;
 import com.portfolio.timetable.model.Department;
 import com.portfolio.timetable.repository.DepartmentRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ public class DepartmentService {
         this.departmentRepository = departmentRepository;
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public Response create(Request request) {
         if (departmentRepository.existsByCodeIgnoreCase(request.code())) {
             throw new IllegalArgumentException("A department with code '" + request.code() + "' already exists");
@@ -38,6 +40,7 @@ public class DepartmentService {
         return toResponse(getOrThrow(id));
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public Response update(Long id, Request request) {
         Department department = getOrThrow(id);
         department.setCode(request.code());
@@ -45,6 +48,7 @@ public class DepartmentService {
         return toResponse(department);
     }
 
+    @PreAuthorize("hasRole('COORDINATOR')")
     public void delete(Long id) {
         if (!departmentRepository.existsById(id)) {
             throw new ResourceNotFoundException("Department " + id + " not found");
