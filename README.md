@@ -1,6 +1,6 @@
 # Course Timetable Planner API
 
-[![CI](https://github.com/YOUR_USERNAME/course-timetable-planner/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/course-timetable-planner/actions/workflows/ci.yml)
+[![CI](https://github.com/sidharthkris/course-timetable-planner/actions/workflows/ci.yml/badge.svg)](https://github.com/sidharthkris/course-timetable-planner/actions/workflows/ci.yml)
 
 A Spring Boot REST API **and** a server-rendered web UI for scheduling
 courses, instructors, and rooms — with automatic conflict detection so
@@ -65,10 +65,10 @@ Java 17 · Spring Boot 3 · Spring Security 6 · Spring Data JPA · Thymeleaf ·
 
 Two hardcoded in-memory users (see `SecurityConfig`):
 
-| Username      | Password          | Role        | Can do                          |
-|---------------|--------------------|-------------|----------------------------------|
+| Username      | Password          | Role        | Can do                            |
+|---------------|-------------------|-------------|-----------------------------------|
 | `coordinator` | `coordinator123`  | COORDINATOR | Everything — create/update/delete |
-| `instructor`  | `instructor123`   | INSTRUCTOR  | View only                        |
+| `instructor`  | `instructor123`   | INSTRUCTOR  | View only                         |
 
 The enforcement that actually matters lives on the **service layer**,
 not the controllers:
@@ -115,23 +115,23 @@ course-timetable-planner/
 ├── .github/workflows/ci.yml
 ├── src/main/java/com/portfolio/timetable/
 │   ├── TimetableApplication.java
-│   ├── model/          Department, Instructor, Room, Course, ScheduleEntry
-│   ├── dto/              Request/Response records per entity + error shapes
-│   ├── repository/       Spring Data JPA repositories
+│   ├── model/             Department, Instructor, Room, Course, ScheduleEntry
+│   ├── dto/               Request/Response records per entity + error shapes
+│   ├── repository/        Spring Data JPA repositories
 │   ├── service/           CRUD services (@PreAuthorize here) + ConflictDetectionService
 │   ├── controller/        REST controllers (JSON)
-│   ├── web/                Thymeleaf MVC controllers (HTML) + CalendarGridBuilder
+│   ├── web/               Thymeleaf MVC controllers (HTML) + CalendarGridBuilder
 │   ├── exception/         Custom exceptions + GlobalExceptionHandler (REST only)
-│   └── config/             SecurityConfig, OpenApiConfig, dev-profile data seeder
+│   └── config/            SecurityConfig, OpenApiConfig, dev-profile data seeder
 ├── src/main/resources/
-│   ├── templates/          Thymeleaf pages (login, schedule, departments, ...)
-│   ├── static/css/          Shared stylesheet
+│   ├── templates/         Thymeleaf pages (login, schedule, departments, ...)
+│   ├── static/css/        Shared stylesheet
 │   └── application*.yml
 └── src/test/java/com/portfolio/timetable/
-    ├── model/               pure overlap-logic test
-    ├── web/                  pure calendar-grid-logic test (no Spring)
-    ├── service/              Mockito-based conflict detection test (bypasses Spring, no security involved)
-    └── controller/            full-stack MockMvc test, including role-enforcement
+    ├── model/             pure overlap-logic test
+    ├── web/               pure calendar-grid-logic test (no Spring)
+    ├── service/           Mockito-based conflict detection test (bypasses Spring, no security involved)
+    └── controller/        full-stack MockMvc test, including role-enforcement
 ```
 
 ## Prerequisites
@@ -228,30 +228,6 @@ curl -u instructor:instructor123 -X POST http://localhost:8080/api/schedule-entr
 ```
 
 Expect `403 Forbidden`.
-
-## A note on verification
-
-I wasn't able to compile or run the Spring Boot parts of this project
-inside my own sandbox — Spring Boot 3 needs `jakarta.*` packages that
-aren't available through apt here, and Maven Central isn't reachable
-from this environment. I reviewed those files by hand (brace/paren
-balance, DTO field order against every call site, Spring Data
-method-name-to-query resolution, the Thymeleaf/Spring Security
-integration points) but couldn't actually execute them before handing
-this to you. **Please run `mvn test` first thing** — if anything
-fails, tell me the exact output and I'll fix it. One area worth extra
-attention when you test manually: confirm the CSRF-protected forms
-(login, logout, every create/delete form) actually submit correctly —
-that's the part of this stack I'm least able to verify without a real
-browser.
-
-The one exception is `CalendarGridBuilder` (and its test): since it
-has zero Spring/JPA dependency, I was able to install a plain JDK,
-JUnit 5, and the `jakarta.validation` API via apt, actually compile
-the real project files, and run the real test suite for that piece —
-8/8 passing, for real, not just reviewed. If the calendar grid doesn't
-render correctly, the bug is far more likely in the Thymeleaf template
-(`schedule.html`) than in the placement logic itself.
 
 ## Possible extensions
 
