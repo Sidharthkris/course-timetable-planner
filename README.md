@@ -9,6 +9,16 @@ only a coordinator can change anything. Modelled directly on the
 timetabling work of an academic coordinator managing multiple
 departments.
 
+## Screenshots
+
+| Weekly calendar grid (coordinator view) | Conflict detection in action |
+|---|---|
+| ![Weekly schedule grid](docs/screenshots/schedule-coordinator.png) | ![Conflict error banner](docs/screenshots/schedule-conflict.png) |
+
+| Instructor view (read-only, no controls) | Swagger UI |
+|---|---|
+| ![Instructor view](docs/screenshots/schedule-instructor.png) | ![Swagger UI](docs/screenshots/swagger-ui.png) |
+
 ## The core idea
 
 Everything exists in service of one rule: **an instructor or a room
@@ -115,23 +125,23 @@ course-timetable-planner/
 ├── .github/workflows/ci.yml
 ├── src/main/java/com/portfolio/timetable/
 │   ├── TimetableApplication.java
-│   ├── model/             Department, Instructor, Room, Course, ScheduleEntry
-│   ├── dto/               Request/Response records per entity + error shapes
-│   ├── repository/        Spring Data JPA repositories
-│   ├── service/           CRUD services (@PreAuthorize here) + ConflictDetectionService
-│   ├── controller/        REST controllers (JSON)
-│   ├── web/               Thymeleaf MVC controllers (HTML) + CalendarGridBuilder
-│   ├── exception/         Custom exceptions + GlobalExceptionHandler (REST only)
-│   └── config/            SecurityConfig, OpenApiConfig, dev-profile data seeder
+│   ├── model/                 Department, Instructor, Room, Course, ScheduleEntry
+│   ├── dto/                   Request/Response records per entity + error shapes
+│   ├── repository/            Spring Data JPA repositories
+│   ├── service/               CRUD services (@PreAuthorize here) + ConflictDetectionService
+│   ├── controller/            REST controllers (JSON)
+│   ├── web/                   Thymeleaf MVC controllers (HTML) + CalendarGridBuilder
+│   ├── exception/             Custom exceptions + GlobalExceptionHandler (REST only)
+│   └── config/                SecurityConfig, OpenApiConfig, dev-profile data seeder
 ├── src/main/resources/
-│   ├── templates/         Thymeleaf pages (login, schedule, departments, ...)
-│   ├── static/css/        Shared stylesheet
+│   ├── templates/             Thymeleaf pages (login, schedule, departments, ...)
+│   ├── static/css/            Shared stylesheet
 │   └── application*.yml
 └── src/test/java/com/portfolio/timetable/
-    ├── model/             pure overlap-logic test
-    ├── web/               pure calendar-grid-logic test (no Spring)
-    ├── service/           Mockito-based conflict detection test (bypasses Spring, no security involved)
-    └── controller/        full-stack MockMvc test, including role-enforcement
+    ├── model/                 pure overlap-logic test
+    ├── web/                   pure calendar-grid-logic test (no Spring)
+    ├── service/               Mockito-based conflict detection test (bypasses Spring, no security involved)
+    └── controller/            full-stack MockMvc test, including role-enforcement
 ```
 
 ## Prerequisites
